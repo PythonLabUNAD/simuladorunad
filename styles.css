@@ -133,7 +133,7 @@ header::after{
   line-height:1.03;
   font-weight:800;
   letter-spacing:.1px;
-  white-space:normal; /* <--- Cámbialo a 'normal' */
+  white-space:normal;
 }
 .hero-title-v9 .sim{color:#fff}
 .hero-title-v9 .python{color:#8be842}
