@@ -315,6 +315,9 @@ header::after{
 }
 
 @media (max-width: 768px) {
+  .estado {
+    display: none !important;
+  }
   .hero-chip-row {
     display: none !important;
   }
@@ -325,7 +328,10 @@ header::after{
     font-size: 24px !important;
   }
   .hero-subtitle-v9 {
+    display: block !important;
+    width: 100% !important;
     font-size: 13px !important;
+    line-height: 1.4 !important;
     margin-top: 8px !important;
   }
   .hero-app-icon {
