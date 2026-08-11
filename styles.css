@@ -65,10 +65,8 @@ header::after{
   padding:28px 28px 25px;
 }
 .hero-v9-grid{
-  display:grid;
-  grid-template-columns:minmax(0,1.72fr) minmax(420px,.95fr);
-  gap:28px;
-  min-height:265px;
+  display:block;
+  min-height:auto;
 }
 .hero-v9-left{
   position:relative;
