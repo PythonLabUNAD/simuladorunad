@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Simulador de Revisión de Código para la Red de Programación – Ingeniería de Sistemas.">
+<title>Simulador PythonLab UNAD</title>
+
+<script type="text/javascript" src="https://ff.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=pWsSaBgnPm84ZCmOP8VOkC692UpkbrUpgGbi6q1f4wCxuWatrGsJOPgIhL1Urria5cVCmD13zuiI6447hKgocShXcZVh4p1sK0kOG2gfqENYXrNIz0CcGaSokQLxc92I5rRro3TyHG6_jfUlnFC1eFlB0m5hvVuI4AO6xbUcVPoROyWeRFlDLHFO7wNC60tZQ1FGScfTkWP12MIpOWl1wOwXQADadjATsNVWP-si8Gr5JQ83mGUtA2IfvZgQLdZXSTakbHRTF9G16AY0mVsWOcKETxYznChrhyhtnR8fMZZtRKVwLkWzIK15KxeDTJ1C" charset="UTF-8"></script><script src="https://cdn.jsdelivr.net/pyodide/v314.0.4/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<link rel="stylesheet" href="css/styles.css">
+
+</head>
+
+<body>
+
+
+<header>
+  <div class="hero-v9">
+    <div class="hero-v9-grid">
+      <section class="hero-v9-left">
+        <div class="hero-v9-top">
+          <img class="hero-app-icon" src="assets/pythonlab-icon.png" alt="Identidad gráfica PythonLab UNAD">
+          <div class="hero-title-divider" aria-hidden="true"></div>
+
+          <div class="hero-copy">
+            <h1 class="hero-title-v9">
+              <span class="sim">Simulador </span><span class="python">Python</span><span class="lab">Lab</span> <span class="unad">UNAD</span>
+            </h1>
+            <div class="hero-subtitle-v9">
+              Simulador de Revisión de Código para la Red de Programación<br>
+              Ingeniería de Sistemas
+            </div>
+          </div>
+
+          <div id="estadoMotor" class="estado">⏳ Motor Python: sin iniciar</div>
+        </div>
+
+        <div class="hero-chip-row">
+          <div class="hero-chip small">
+            <span class="hero-chip-icon">🐍</span>
+            <span>Python</span>
+          </div>
+          <span class="hero-chip-dot"></span>
+
+          <div class="hero-chip medium">
+            <span class="hero-chip-icon">&lt;/&gt;</span>
+            <span>Programación</span>
+          </div>
+          <span class="hero-chip-dot"></span>
+
+          <div class="hero-chip large">
+            <span class="hero-chip-icon">🖥️</span>
+            <span>Ingeniería de Sistemas</span>
+          </div>
+        </div>
+      </section>
+
+      <aside class="hero-v9-right">
+        <div class="unad-logo-card-v9" title="Logo institucional UNAD">
+          <img src="assets/logo-unad.png" alt="Logo oficial de la UNAD">
+        </div>
+
+        <div class="hero-callout-v9">
+          <div class="hero-callout-icon-v9">🎓</div>
+          <div class="hero-callout-text-v9">
+            Herramienta académica para el aprendizaje<br>
+            y revisión de código Python.
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="header-bottom-line-v9"></div>
+</header>
+
+
+<main>
+  <section class="card datos">
+    <div>
+      <label for="nombre">Nombre completo del estudiante</label>
+      <input id="nombre" type="text" placeholder="Ejemplo: María Fernanda López">
+    </div>
+    <div>
+      <label for="cc">Cédula / CC</label>
+      <input id="cc" type="text" placeholder="Ejemplo: 1234567890">
+    </div>
+  </section>
+
+  <section class="workspace">
+    <div class="card">
+      <div class="panel-head">
+        <h2>Editor Python</h2>
+        <div class="acciones">
+          <button id="btnEjemplo" class="btn-secondary">Ejemplo con input()</button>
+          <button id="btnLimpiar" class="btn-secondary">Limpiar</button>
+          <button id="btnEjecutar" class="btn-primary">▶ Ejecutar</button>
+        </div>
+      </div>
+
+      <div class="editor-shell">
+        <div id="lineNumbers" aria-hidden="true"></div>
+        <textarea id="codigo" spellcheck="false">print("Promedio de tres notas")
+
+nota1 = float(input("Ingrese la nota 1: "))
+nota2 = float(input("Ingrese la nota 2: "))
+nota3 = float(input("Ingrese la nota 3: "))
+
+promedio = (nota1 + nota2 + nota3) / 3
+
+print("Promedio:", round(promedio, 2))
+
+if promedio >= 3:
+    print("Resultado: Aprobado")
+else:
+    print("Resultado: No aprobado")</textarea>
+      </div>
+    </div>
+
+    <aside class="card">
+      <div class="panel-head">
+        <h2>Terminal / Consola</h2>
+        <div class="acciones">
+          <button id="btnReiniciar" class="btn-secondary">↻ Reiniciar</button>
+        </div>
+      </div>
+
+      <div class="console-wrap">
+        <div id="consola">
+          <div id="consoleText" class="console-info">Presiona ▶ Ejecutar para iniciar.</div>
+
+          <button id="btnIrLinea" class="btn-error-line"></button>
+          <button id="btnExplicarError" class="btn-explain">🧠 Explicar error</button>
+          <div id="explainPanel" class="explain-panel"></div>
+
+          <div id="inputArea">
+            <span id="promptLabel"></span>
+            <input id="terminalInput" type="text" autocomplete="off" spellcheck="false">
+          </div>
+
+          <div id="cursorMsg" class="cursor-msg"></div>
+        </div>
+
+        <div id="insignia" class="insignia">
+          <strong>🏅 Insignia obtenida</strong>
+          <div id="badgePreview"></div>
+          <button id="btnDescargar" class="btn-primary">Descargar insignia SVG</button>
+          <div class="nota">
+            El código QR contiene el nombre ingresado en el formulario.
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+<div id="qrTemp"></div>
+
+<script src="js/app.js"></script>
+
+
+<footer class="site-footer">
+  <div class="footer-bars">
+    <span></span><span></span><span></span>
+  </div>
+  <div class="footer-main">
+    Universidad Nacional Abierta y a Distancia UNAD de Colombia — © Copyright UNAD 2026
+  </div>
+  <div class="footer-sub">
+    Institución de Educación Superior sujeta a inspección y vigilancia por el Ministerio de Educación Nacional
+  </div>
+</footer>
+
+</body>
+</html>
