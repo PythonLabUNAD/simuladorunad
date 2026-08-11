@@ -314,6 +314,30 @@ header::after{
   }
 }
 
+@media (max-width: 768px) {
+  .hero-chip-row {
+    display: none !important;
+  }
+  .hero-v9 {
+    padding: 16px 14px 14px !important;
+  }
+  .hero-title-v9 {
+    font-size: 24px !important;
+  }
+  .hero-subtitle-v9 {
+    font-size: 13px !important;
+    margin-top: 8px !important;
+  }
+  .hero-app-icon {
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 14px !important;
+  }
+  .hero-title-divider {
+    height: 64px !important;
+  }
+}
+
 main{
   max-width:1320px;
   margin:20px auto;
