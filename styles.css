@@ -81,11 +81,33 @@ header::after{
   flex-direction:column;
   justify-content:flex-start;
 }
-.hero-v9-top{
-  display:grid;
-  grid-template-columns:116px 4px minmax(0,1fr) auto;
-  gap:17px;
-  align-items:start;
+.hero-v9-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 17px;
+}
+
+.hero-copy {
+  flex: 1;
+  min-width: 280px;
+  padding-top: 2px;
+}
+
+.estado {
+  margin-top: 2px;
+  padding: 9px 16px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 999px;
+  background: linear-gradient(180deg,rgba(32,76,137,.62),rgba(19,53,104,.62));
+  color: #fff;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  margin-left: auto; /* Empuja el botón a la derecha si hay espacio */
 }
 .hero-app-icon{
   width:112px;
@@ -111,7 +133,7 @@ header::after{
   line-height:1.03;
   font-weight:800;
   letter-spacing:.1px;
-  white-space:nowrap;
+  white-space:normal; /* <--- Cámbialo a 'normal' */
 }
 .hero-title-v9 .sim{color:#fff}
 .hero-title-v9 .python{color:#8be842}
