@@ -315,6 +315,14 @@ header::after{
 }
 
 @media (max-width: 768px) {
+  header {
+    border-top-left-radius: 20px !important;
+    border-top-right-radius: 20px !important;
+    border-bottom-left-radius: 20px !important;
+    border-bottom-right-radius: 20px !important;
+    margin: 10px 10px 0 10px !important;
+    overflow: hidden !important;
+  }
   .estado {
     display: none !important;
   }
@@ -328,11 +336,7 @@ header::after{
     font-size: 24px !important;
   }
   .hero-subtitle-v9 {
-    display: block !important;
-    width: 100% !important;
-    font-size: 13px !important;
-    line-height: 1.4 !important;
-    margin-top: 8px !important;
+    display: none !important;
   }
   .hero-app-icon {
     width: 64px !important;
