@@ -209,13 +209,53 @@ function obtenerTextoLinea(numero){
   return lineas[numero - 1] || "";
 }
 
+function generarExplicacion(errorTexto) {
+  if (!errorTexto) errorTexto = "";
+  if (errorTexto.includes('IndexError')) {
+    return 'Índice fuera de rango (IndexError): Estás intentando acceder a una posición que no existe en la lista o matriz. Recuerda que en Python las posiciones inician en 0 y terminan en longitud - 1.';
+  }
+  if (errorTexto.includes('ValueError')) {
+    return 'Valor inválido (ValueError): La función esperaba un tipo de dato específico (por ejemplo un número en int() o float()), pero recibió un texto o formato incompatible.';
+  }
+  if (errorTexto.includes('KeyError')) {
+    return 'Clave no encontrada (KeyError): Estás intentando acceder a una propiedad de un diccionario que no existe o está mal escrita.';
+  }
+  if (errorTexto.includes('IndentationError')) {
+    return 'Error de indentación (IndentationError): Los bloques de código dentro de funciones, if, for o while deben tener exactamente la misma sangría (espacios al inicio).';
+  }
+  if (errorTexto.includes('ZeroDivisionError')) {
+    return 'División por cero (ZeroDivisionError): Estás intentando dividir un número entre 0. Verifica los cálculos de promedios o totales.';
+  }
+  if (errorTexto.includes('UnboundLocalError')) {
+    return 'Variable local no inicializada (UnboundLocalError): Intentas modificar una variable fuera de la función sin declararla como global.';
+  }
+  if (errorTexto.includes('AttributeError')) {
+    return 'Atributo o método inválido (AttributeError): Estás aplicando un método que no pertenece a ese tipo de dato (por ejemplo usar .append() en un entero o diccionario).';
+  }
+  if (errorTexto.includes('NameError')) {
+    return 'Nombre no definido (NameError): Usaste una variable o función que no existe o tiene errores de digitación (mayúsculas/minúsculas).';
+  }
+  if (errorTexto.includes('SyntaxError')) {
+    return 'Error de sintaxis (SyntaxError): Falta un caracter estructural como dos puntos (:), cerrar paréntesis (), o cerrar comillas.';
+  }
+  if (errorTexto.includes('TypeError')) {
+    return 'Error de tipos (TypeError): Intentas realizar una operación entre tipos incompatibles (por ejemplo sumar texto con números).';
+  }
+  return 'Revisa la estructura de tu código, los nombres de variables y la lógica de ejecución.';
+}
+
+function explicarError(errorTexto) {
+  return generarExplicacion(errorTexto);
+}
+
 function construirExplicacionError(errorTexto){
   const lower = (errorTexto || "").toLowerCase();
   const linea = detectarLineaError(errorTexto);
   const lineaTexto = obtenerTextoLinea(linea);
+  const explicacion = generarExplicacion(errorTexto || "");
 
   let tipo = "Error de ejecución";
-  let causa = "Ocurrió un error durante la ejecución del programa.";
+  let causa = explicacion;
   let sugerencias = [
     "Revisa cuidadosamente la línea señalada y las líneas inmediatamente anteriores.",
     "Comprueba nombres de variables, operadores, paréntesis, comillas e indentación.",
@@ -225,7 +265,6 @@ function construirExplicacionError(errorTexto){
 
   if(lower.includes("syntaxerror")){
     tipo = "SyntaxError";
-    causa = "Python encontró una instrucción escrita con una estructura no válida.";
     sugerencias = [
       "Verifica si falta un signo de dos puntos (:) en un if, for, while, def o else.",
       "Revisa paréntesis, comillas o llaves mal cerradas.",
@@ -234,7 +273,6 @@ function construirExplicacionError(errorTexto){
     ejemplo = "Ejemplo: if promedio >= 3:";
   } else if(lower.includes("indentationerror")){
     tipo = "IndentationError";
-    causa = "La sangría o indentación del código no es correcta.";
     sugerencias = [
       "Usa la misma cantidad de espacios en los bloques del if, for, while, def, etc.",
       "Evita mezclar tabulaciones con espacios.",
@@ -243,7 +281,6 @@ function construirExplicacionError(errorTexto){
     ejemplo = "Ejemplo:\nif promedio >= 3:\n    print(\"Aprobado\")";
   } else if(lower.includes("nameerror")){
     tipo = "NameError";
-    causa = "Se está usando una variable o función que Python no reconoce.";
     sugerencias = [
       "Comprueba si el nombre está bien escrito.",
       "Asegúrate de haber creado la variable antes de usarla.",
@@ -251,7 +288,6 @@ function construirExplicacionError(errorTexto){
     ];
   } else if(lower.includes("typeerror")){
     tipo = "TypeError";
-    causa = "Se están mezclando tipos de datos incompatibles o se llamó mal una función.";
     sugerencias = [
       "Revisa si estás sumando texto con números o pasando argumentos incorrectos.",
       "Convierte los datos cuando sea necesario con int(), float() o str().",
@@ -259,7 +295,6 @@ function construirExplicacionError(errorTexto){
     ];
   } else if(lower.includes("valueerror")){
     tipo = "ValueError";
-    causa = "El valor ingresado o procesado no tiene el formato esperado.";
     sugerencias = [
       "Si usas int() o float(), verifica que el dato ingresado sea realmente numérico.",
       "Evita letras o símbolos cuando se espera un número.",
@@ -268,15 +303,20 @@ function construirExplicacionError(errorTexto){
     ejemplo = "Ejemplo: float(\"4.5\") es válido, float(\"cuatro\") no lo es.";
   } else if(lower.includes("zerodivisionerror")){
     tipo = "ZeroDivisionError";
-    causa = "Se intentó dividir entre cero.";
     sugerencias = [
       "Verifica el valor del divisor antes de hacer la operación.",
       "Agrega una condición para impedir la división entre cero.",
       "Muestra un mensaje al usuario si el divisor es 0."
     ];
+  } else if(lower.includes("unboundlocalerror")){
+    tipo = "UnboundLocalError";
+    sugerencias = [
+      "Declara la variable como global si deseas modificarla dentro de una función.",
+      "Pasa la variable como parámetro o inicialízala localmente antes de usarla."
+    ];
+    ejemplo = "Ejemplo:\ncontador = 0\ndef incrementar():\n    global contador\n    contador += 1";
   } else if(lower.includes("indexerror")){
     tipo = "IndexError";
-    causa = "Se intentó acceder a una posición que no existe en una lista o secuencia.";
     sugerencias = [
       "Comprueba el tamaño de la lista con len().",
       "Recuerda que los índices empiezan en 0.",
@@ -284,15 +324,13 @@ function construirExplicacionError(errorTexto){
     ];
   } else if(lower.includes("keyerror")){
     tipo = "KeyError";
-    causa = "Se intentó acceder a una clave que no existe en un diccionario.";
     sugerencias = [
       "Revisa si la clave está escrita correctamente.",
       "Usa diccionario.get(clave) si deseas evitar el error.",
-      "Comprueba primero si la clave existe."
+      "Comprueba primero si la clave existe en el diccionario."
     ];
   } else if(lower.includes("modulenotfounderror")){
     tipo = "ModuleNotFoundError";
-    causa = "Python no encontró el módulo que se está intentando importar.";
     sugerencias = [
       "Verifica que el nombre del módulo esté bien escrito.",
       "Comprueba si ese módulo está disponible en el entorno Pyodide.",
@@ -300,7 +338,6 @@ function construirExplicacionError(errorTexto){
     ];
   } else if(lower.includes("attributeerror")){
     tipo = "AttributeError";
-    causa = "Se llamó un atributo o método que ese objeto no tiene.";
     sugerencias = [
       "Comprueba el tipo de dato de la variable.",
       "Revisa si el método o atributo existe realmente para ese objeto.",
@@ -308,7 +345,6 @@ function construirExplicacionError(errorTexto){
     ];
   } else if(lower.includes("eoferror")){
     tipo = "EOFError";
-    causa = "El programa pidió un dato con input() y no recibió entrada.";
     sugerencias = [
       "Cuando aparezca el cuadro de entrada en la consola, escribe el valor y presiona Enter.",
       "No cierres ni reinicies la sesión mientras el programa espera datos.",
