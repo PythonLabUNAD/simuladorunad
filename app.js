@@ -16,6 +16,7 @@ const $ = id => document.getElementById(id);
 
 const nombre = $("nombre");
 const cc = $("cc");
+const inputGrupo = $("input-grupo");
 const codigo = $("codigo");
 const lineNumbers = $("lineNumbers");
 const estadoMotor = $("estadoMotor");
@@ -528,8 +529,10 @@ function generarQRDataURL(texto){
   throw new Error("No se pudo convertir el QR a imagen.");
 }
 
-function crearInsignia(nom, documento){
-  const qrData = generarQRDataURL(nom);
+function crearInsignia(nom, documento, grupo){
+  const textGrupo = grupo ? grupo.trim() : "";
+  const qrPayload = `Estudiante: ${nom} | CC: ${documento}${textGrupo ? ` | Grupo: ${textGrupo}` : ""}`;
+  const qrData = generarQRDataURL(qrPayload);
   const fecha = new Date().toLocaleDateString("es-CO",{
     year:"numeric",month:"long",day:"numeric"
   });
@@ -565,19 +568,22 @@ function crearInsignia(nom, documento){
   <text x="390" y="156"
         font-family="Arial" font-size="20" fill="#dce8f8">Código ejecutado correctamente</text>
 
-  <text x="90" y="270"
-        font-family="Arial" font-size="16" fill="#aebfd7">ESTUDIANTE</text>
+  <text x="90" y="260"
+        font-family="Arial" font-size="15" fill="#aebfd7">ESTUDIANTE</text>
 
-  <text x="90" y="312"
-        font-family="Arial" font-size="30" font-weight="bold" fill="#ffffff">${escXML(nom)}</text>
+  <text x="90" y="298"
+        font-family="Arial" font-size="28" font-weight="bold" fill="#ffffff">${escXML(nom)}</text>
 
-  <text x="90" y="356"
-        font-family="Arial" font-size="22" fill="#f4b400">CC: ${escXML(documento)}</text>
+  <text x="90" y="338"
+        font-family="Arial" font-size="20" fill="#f4b400">CC: ${escXML(documento)}</text>
 
-  <text x="90" y="405"
-        font-family="Arial" font-size="16" fill="#dce8f8">Competencia: ejecución de código Python</text>
+  <text x="90" y="374"
+        font-family="Arial" font-size="18" font-weight="bold" fill="#38bdf8">GRUPO: ${escXML(textGrupo || "N/A")}</text>
 
-  <text x="90" y="438"
+  <text x="90" y="414"
+        font-family="Arial" font-size="15" fill="#dce8f8">Competencia: ejecución de código Python</text>
+
+  <text x="90" y="442"
         font-family="Arial" font-size="14" fill="#aebfd7">${escXML(fecha)}</text>
 
   <!-- Sello de Autoria / Porcentaje de Digitación -->
@@ -588,13 +594,16 @@ function crearInsignia(nom, documento){
   <image href="${qrData}" x="738" y="258" width="180" height="180"/>
 
   <text x="827" y="482" text-anchor="middle"
-        font-family="Arial" font-size="13" fill="#dce8f8">Escanea para ver el nombre</text>
+        font-family="Arial" font-size="13" fill="#dce8f8">Escanea para ver datos</text>
 </svg>`;
 }
 
 function mostrarInsignia(){
   try{
-    ultimoSVG = crearInsignia(nombre.value.trim(),cc.value.trim());
+    const valNom = nombre ? nombre.value.trim() : "";
+    const valCc = cc ? cc.value.trim() : "";
+    const valGrupo = inputGrupo ? inputGrupo.value.trim() : "";
+    ultimoSVG = crearInsignia(valNom, valCc, valGrupo);
     badgePreview.innerHTML = ultimoSVG;
     insignia.style.display = "block";
   }catch(e){
