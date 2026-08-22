@@ -9,6 +9,9 @@ let esperandoEntrada = false;
 let sesionActiva = false;
 let lineaErrorActual = null;
 let ultimoErrorTexto = "";
+let caracteresTipeados = 0;
+let caracteresPegados = 0;
+let ultimoLargoCodigo = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -36,6 +39,32 @@ function escXML(v){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&apos;");
+}
+
+function actualizarEstadisticasTipeo(){
+  const badge = $("typingStats");
+  if(!badge || !codigo) return;
+
+  const codigoTexto = codigo.value;
+  if(!codigoTexto.trim()){
+    caracteresTipeados = 0;
+    caracteresPegados = 0;
+    ultimoLargoCodigo = 0;
+    badge.className = "typing-stat-badge";
+    badge.textContent = "✍️ 100% Tipeo manual";
+    return;
+  }
+
+  const total = caracteresTipeados + caracteresPegados;
+  const pctManual = total > 0 ? Math.max(0, Math.min(100, Math.round((caracteresTipeados / total) * 100))) : 100;
+
+  if(pctManual >= 70){
+    badge.className = "typing-stat-badge";
+    badge.textContent = `✍️ ${pctManual}% Tipeo manual`;
+  } else {
+    badge.className = "typing-stat-badge pasted-mode";
+    badge.textContent = `📋 ${100 - pctManual}% Texto pegado`;
+  }
 }
 
 function setEstadoMotor(texto, tipo = "idle"){
@@ -134,11 +163,32 @@ function prepararNavegacionError(error){
   }
 }
 
-codigo.addEventListener("input",()=>{
+codigo.addEventListener("paste", (e) => {
+  const text = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+  if(text.length > 0){
+    caracteresPegados += text.length;
+    actualizarEstadisticasTipeo();
+  }
+});
+
+codigo.addEventListener("input",(e)=>{
   lineaErrorActual = null;
   btnIrLinea.style.display = "none";
   ocultarExplicacion();
   actualizarNumerosLinea();
+
+  const nuevoLargo = codigo.value.length;
+  const delta = nuevoLargo - ultimoLargoCodigo;
+  ultimoLargoCodigo = nuevoLargo;
+
+  if(delta > 0 && e.inputType !== "insertFromPaste"){
+    caracteresTipeados += delta;
+    actualizarEstadisticasTipeo();
+  } else if(nuevoLargo === 0){
+    caracteresTipeados = 0;
+    caracteresPegados = 0;
+    actualizarEstadisticasTipeo();
+  }
 });
 
 codigo.addEventListener("scroll",()=>{
@@ -465,6 +515,13 @@ function crearInsignia(nom, documento){
     year:"numeric",month:"long",day:"numeric"
   });
 
+  const totalChars = caracteresTipeados + caracteresPegados;
+  const pctManual = totalChars > 0 ? Math.max(0, Math.min(100, Math.round((caracteresTipeados / totalChars) * 100))) : 100;
+  const selloTexto = pctManual >= 70
+    ? `Autoría: Digitación activa (${pctManual}% manual)`
+    : `Modo: Texto pegado/externo (${100 - pctManual}% pegado)`;
+  const selloColor = pctManual >= 70 ? "#4ade80" : "#38bdf8";
+
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
   <defs>
@@ -496,11 +553,14 @@ function crearInsignia(nom, documento){
   <text x="90" y="372"
         font-family="Arial" font-size="22" fill="#f4b400">CC: ${escXML(documento)}</text>
 
-  <text x="90" y="430"
+  <text x="90" y="425"
         font-family="Arial" font-size="17" fill="#dce8f8">Competencia: ejecución de código Python</text>
 
-  <text x="90" y="468"
+  <text x="90" y="460"
         font-family="Arial" font-size="15" fill="#aebfd7">${escXML(fecha)}</text>
+
+  <text x="90" y="498"
+        font-family="Arial" font-size="14" font-weight="bold" fill="${selloColor}">✍️ ${escXML(selloTexto)}</text>
 
   <rect x="725" y="245" width="205" height="205" rx="15" fill="#ffffff"/>
   <image href="${qrData}" x="738" y="258" width="180" height="180"/>
@@ -774,7 +834,11 @@ if promedio >= 3:
 else:
     print("Resultado: No aprobado")`;
   lineaErrorActual = null;
+  caracteresTipeados = codigo.value.length;
+  caracteresPegados = 0;
+  ultimoLargoCodigo = codigo.value.length;
   actualizarNumerosLinea();
+  actualizarEstadisticasTipeo();
 });
 
 $("btnLimpiar").addEventListener("click",()=>{
@@ -782,6 +846,9 @@ $("btnLimpiar").addEventListener("click",()=>{
   entradasUsuario = [];
   codigoActual = "";
   lineaErrorActual = null;
+  caracteresTipeados = 0;
+  caracteresPegados = 0;
+  ultimoLargoCodigo = 0;
   ocultarInput();
   ocultarInsignia();
   btnIrLinea.style.display = "none";
@@ -789,6 +856,7 @@ $("btnLimpiar").addEventListener("click",()=>{
   btnEjecutar.disabled = false;
   setConsole("Editor limpio. Escribe un programa y presiona ▶ Ejecutar.","console-info");
   actualizarNumerosLinea();
+  actualizarEstadisticasTipeo();
 });
 
 $("btnDescargar").addEventListener("click",()=>{
