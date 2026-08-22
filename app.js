@@ -364,20 +364,36 @@ function construirExplicacionError(errorTexto){
     ];
   }
 
-  const lineaHtml = linea ? `<div class="explain-block"><strong>Línea detectada</strong> <code>${linea}</code></div>` : "";
-  const codigoHtml = lineaTexto ? `<div class="explain-block"><strong>Código de la línea</strong> <code>${escaparHTML(lineaTexto)}</code></div>` : "";
-  const ejemploHtml = ejemplo ? `<div class="explain-block"><strong>Ejemplo orientativo</strong><div>${escaparHTML(ejemplo).replaceAll("\n","<br>")}</div></div>` : "";
   const sugerenciasHtml = sugerencias.map(s => `<li>${escaparHTML(s)}</li>`).join("");
+  const saludoLinea = linea
+    ? `¡Hola! Veo que tenemos un pequeño inconveniente en la línea ${linea}.`
+    : `¡Hola! Veo que tenemos un pequeño inconveniente en la ejecución de tu código.`;
+
+  const lineaCodigoHtml = lineaTexto
+    ? `<div style="margin-top: 6px;"><code>Línea ${linea}: ${escaparHTML(lineaTexto)}</code></div>`
+    : "";
+
+  const ejemploHtml = ejemplo
+    ? `<br><span class="terminal-header">📖 Ejemplo guía:</span><div>${escaparHTML(ejemplo).replaceAll("\n","<br>")}</div>`
+    : "";
 
   return `
-    <h3>🧠 Explicación automática del error</h3>
-    <div class="explain-block"><strong>Tipo de error</strong> <code>${escaparHTML(tipo)}</code></div>
-    ${lineaHtml}
-    ${codigoHtml}
-    <div class="explain-block"><strong>¿Qué significa?</strong> ${escaparHTML(causa)}</div>
-    <div class="explain-block"><strong>¿Cómo corregirlo?</strong><ul>${sugerenciasHtml}</ul></div>
+    <div><span class="terminal-prompt">&gt;</span> <span class="terminal-ia-character">🐍 Asistente UNAD:</span> ${saludoLinea}</div>
+    <br>
+    <div><span class="terminal-header">💡 Mi Consejo:</span></div>
+    <div>Me parece que hay un <strong>${escaparHTML(tipo)}</strong>. ${escaparHTML(causa)}</div>
+    ${lineaCodigoHtml}
+    <br>
+    <div><span class="terminal-header">🔧 Pasos para corregir:</span></div>
+    <ul class="terminal-list">
+      ${sugerenciasHtml}
+    </ul>
     ${ejemploHtml}
-    <div class="explain-block"><strong>Mensaje técnico detectado</strong><code>${escaparHTML(errorTexto)}</code></div>
+    <br>
+    <details class="terminal-technical-details">
+      <summary>Ver detalles técnicos (para curiosos)</summary>
+      <pre class="code-traceback">${escaparHTML(errorTexto)}</pre>
+    </details>
   `;
 }
 
