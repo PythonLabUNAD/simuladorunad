@@ -41,6 +41,24 @@ function escXML(v){
     .replaceAll("'","&apos;");
 }
 
+function calcularPorcentajes(){
+  if(!codigo) return { pctManual: 100, pctPegado: 0 };
+  const lenActual = codigo.value.length;
+  if (!lenActual) {
+    return { pctManual: 100, pctPegado: 0 };
+  }
+
+  const totalAccion = caracteresTipeados + caracteresPegados;
+  if (totalAccion === 0) {
+    return { pctManual: 100, pctPegado: 0 };
+  }
+
+  const pctManual = Math.max(0, Math.min(100, Math.round((caracteresTipeados / totalAccion) * 100)));
+  const pctPegado = 100 - pctManual;
+
+  return { pctManual, pctPegado };
+}
+
 function actualizarEstadisticasTipeo(){
   const badge = $("typingStats");
   if(!badge || !codigo) return;
@@ -51,19 +69,18 @@ function actualizarEstadisticasTipeo(){
     caracteresPegados = 0;
     ultimoLargoCodigo = 0;
     badge.className = "typing-stat-badge";
-    badge.textContent = "✍️ 100% Tipeo manual";
+    badge.textContent = "✍️ Tipeo: 100% | Pegado: 0%";
     return;
   }
 
-  const total = caracteresTipeados + caracteresPegados;
-  const pctManual = total > 0 ? Math.max(0, Math.min(100, Math.round((caracteresTipeados / total) * 100))) : 100;
+  const { pctManual, pctPegado } = calcularPorcentajes();
 
-  if(pctManual >= 70){
+  if(pctManual >= 50){
     badge.className = "typing-stat-badge";
-    badge.textContent = `✍️ ${pctManual}% Tipeo manual`;
+    badge.textContent = `✍️ Tipeo: ${pctManual}% | Pegado: ${pctPegado}%`;
   } else {
     badge.className = "typing-stat-badge pasted-mode";
-    badge.textContent = `📋 ${100 - pctManual}% Texto pegado`;
+    badge.textContent = `📋 Pegado: ${pctPegado}% | Tipeo: ${pctManual}%`;
   }
 }
 
@@ -515,12 +532,11 @@ function crearInsignia(nom, documento){
     year:"numeric",month:"long",day:"numeric"
   });
 
-  const totalChars = caracteresTipeados + caracteresPegados;
-  const pctManual = totalChars > 0 ? Math.max(0, Math.min(100, Math.round((caracteresTipeados / totalChars) * 100))) : 100;
-  const selloTexto = pctManual >= 70
-    ? `Autoría: Digitación activa (${pctManual}% manual)`
-    : `Modo: Texto pegado/externo (${100 - pctManual}% pegado)`;
-  const selloColor = pctManual >= 70 ? "#4ade80" : "#38bdf8";
+  const { pctManual, pctPegado } = calcularPorcentajes();
+  const selloTexto = pctManual >= 50
+    ? `Composición: ${pctManual}% Tipeo manual | ${pctPegado}% Pegado`
+    : `Composición: ${pctPegado}% Texto pegado | ${pctManual}% Tipeo manual`;
+  const selloColor = pctManual >= 50 ? "#4ade80" : "#38bdf8";
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
@@ -897,6 +913,11 @@ codigo.addEventListener("keydown",(e)=>{
 
 window.addEventListener("load",()=>{
   actualizarNumerosLinea();
+  if(codigo){
+    ultimoLargoCodigo = codigo.value.length;
+    caracteresTipeados = codigo.value.length;
+    actualizarEstadisticasTipeo();
+  }
 
   setTimeout(()=>{
     if(typeof loadPyodide !== "function"){
