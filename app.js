@@ -84,6 +84,10 @@ function actualizarEstadisticasTipeo(){
   }
 }
 
+function actualizarMetricasAutoria(){
+  actualizarEstadisticasTipeo();
+}
+
 function setEstadoMotor(texto, tipo = "idle"){
   if(!estadoMotor) return;
   const dot = estadoMotor.querySelector(".status-dot");
@@ -181,10 +185,10 @@ function prepararNavegacionError(error){
 }
 
 codigo.addEventListener("paste", (e) => {
-  const text = (e.clipboardData || window.clipboardData)?.getData("text") || "";
-  if(text.length > 0){
-    caracteresPegados += text.length;
-    actualizarEstadisticasTipeo();
+  const pastedText = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+  if(pastedText.length > 0){
+    caracteresPegados += pastedText.length;
+    actualizarMetricasAutoria();
   }
 });
 
@@ -198,13 +202,26 @@ codigo.addEventListener("input",(e)=>{
   const delta = nuevoLargo - ultimoLargoCodigo;
   ultimoLargoCodigo = nuevoLargo;
 
-  if(delta > 0 && e.inputType !== "insertFromPaste"){
-    caracteresTipeados += delta;
-    actualizarEstadisticasTipeo();
-  } else if(nuevoLargo === 0){
+  if (nuevoLargo === 0) {
     caracteresTipeados = 0;
     caracteresPegados = 0;
-    actualizarEstadisticasTipeo();
+    actualizarMetricasAutoria();
+    return;
+  }
+
+  if (delta > 0) {
+    const insertedData = e.data || "";
+    const esPasteNativo = e.inputType === "insertFromPaste" || e.inputType === "insertFromDrop";
+    const esRafaga = delta > 3 && !insertedData.includes("\n") && insertedData !== "    ";
+
+    if (esPasteNativo || esRafaga) {
+      if (!esPasteNativo) {
+        caracteresPegados += delta;
+      }
+    } else {
+      caracteresTipeados += delta;
+    }
+    actualizarMetricasAutoria();
   }
 });
 
