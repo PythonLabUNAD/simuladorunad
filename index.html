@@ -3,44 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Simulador de Revisión de Código para la Red de Programación – Ingeniería de Sistemas.">
+<meta name="description" content="Simulador de Revisión de Código para la Red de Programación – Ingeniería de Sistemas UNAD.">
+<meta name="theme-color" content="#031d46">
+
+<!-- Favicon Metadata (Max-Size Edge-to-Edge Yellow & Blue) -->
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=2">
+<link rel="icon" type="image/png" sizes="64x64 32x32 16x16" href="assets/favicon.png?v=2">
+<link rel="shortcut icon" type="image/png" href="assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="assets/favicon.png?v=2">
+
+<!-- Open Graph / Meta -->
+<meta property="og:title" content="Simulador PythonLab UNAD">
+<meta property="og:description" content="Simulador de Revisión de Código para la Red de Programación – Ingeniería de Sistemas.">
+<meta property="og:image" content="assets/favicon.png">
+
 <title>Simulador PythonLab UNAD</title>
 
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+<!-- Pyodide & QR Libraries -->
 <script src="https://cdn.jsdelivr.net/pyodide/v314.0.4/full/pyodide.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <link rel="stylesheet" href="styles.css">
-
 </head>
 
 <body>
 
-
-<header>
-  <div class="hero-v9">
-    <div class="hero-v9-grid">
-      <section class="hero-v9-left">
-        <div class="hero-v9-top">
-          <img class="hero-app-icon" src="assets/pythonlab-icon.png" alt="Identidad gráfica PythonLab UNAD">
+<header class="hero-header">
+  <div class="hero-ambient-glow hero-glow-1"></div>
+  <div class="hero-ambient-glow hero-glow-2"></div>
+  
+  <div class="hero-container">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <div class="hero-brand">
+          <div class="hero-app-icon-wrapper">
+            <img class="hero-app-icon" src="assets/favicon.png" alt="Identidad gráfica PythonLab UNAD">
+            <div class="hero-icon-ring"></div>
+          </div>
           <div class="hero-title-divider" aria-hidden="true"></div>
 
           <div class="hero-copy">
-            <h1 class="hero-title-v9">
+            <h1 class="hero-title">
               <span class="sim">Simulador </span><span class="python">Python</span><span class="lab">Lab</span> <span class="unad">UNAD</span>
             </h1>
-            <div class="hero-subtitle-v9">
+            <div class="hero-subtitle">
               Simulador de Revisión de Código para la Red de Programación<br>
-              Ingeniería de Sistemas
+              <strong>Ingeniería de Sistemas</strong> — Universidad Nacional Abierta y a Distancia
             </div>
           </div>
 
-          <div id="estadoMotor" class="estado">⏳ Motor Python: sin iniciar</div>
+          <div id="estadoMotor" class="estado-badge estado-idle">
+            <span class="status-dot"></span>
+            <span class="status-text">⏳ Motor Python: sin iniciar</span>
+          </div>
         </div>
 
         <div class="hero-chip-row">
           <div class="hero-chip small">
             <span class="hero-chip-icon">🐍</span>
-            <span>Python</span>
+            <span>Python 3.11</span>
           </div>
           <span class="hero-chip-dot"></span>
 
@@ -51,37 +77,76 @@
           <span class="hero-chip-dot"></span>
 
           <div class="hero-chip large">
-            <span class="hero-chip-icon">🖥️</span>
+            <span class="hero-chip-icon">🎓</span>
             <span>Ingeniería de Sistemas</span>
           </div>
         </div>
-      </section>
+      </div>
+
+      <div class="hero-right">
+        <div class="unad-logo-card">
+          <img src="assets/logo-unad.png" alt="Universidad Nacional Abierta y a Distancia - UNAD">
+        </div>
+      </div>
     </div>
   </div>
-  <div class="header-bottom-line-v9"></div>
+  <div class="header-bottom-line"></div>
 </header>
 
-
-<main>
-  <section class="card datos">
-    <div>
-      <label for="nombre">Nombre completo del estudiante</label>
-      <input id="nombre" type="text" placeholder="Ejemplo: María Fernanda López">
+<main class="main-content">
+  <section class="card datos-card">
+    <div class="section-badge-header">
+      <span class="section-icon">👤</span>
+      <span>Datos del Estudiante</span>
     </div>
-    <div>
-      <label for="cc">Cédula / CC</label>
-      <input id="cc" type="text" placeholder="Ejemplo: 1234567890">
+    
+    <div class="form-grid">
+      <div class="input-group">
+        <label for="nombre">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Nombre completo del estudiante
+        </label>
+        <div class="input-wrapper">
+          <input id="nombre" type="text" placeholder="Ejemplo: María Fernanda López" autocomplete="name">
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="cc">
+          <svg class="label-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="13" y2="12"/><line x1="7" y1="16" x2="9" y2="16"/></svg>
+          Cédula / Documento CC
+        </label>
+        <div class="input-wrapper">
+          <input id="cc" type="text" placeholder="Ejemplo: 1234567890">
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="workspace">
-    <div class="card">
+    <div class="card editor-card">
       <div class="panel-head">
-        <h2>Editor Python</h2>
+        <div class="panel-title-group">
+          <div class="mac-dots">
+            <span class="mac-dot red"></span>
+            <span class="mac-dot yellow"></span>
+            <span class="mac-dot green"></span>
+          </div>
+          <h2>Editor Python</h2>
+        </div>
         <div class="acciones">
-          <button id="btnEjemplo" class="btn-secondary">Ejemplo con input()</button>
-          <button id="btnLimpiar" class="btn-secondary">Limpiar</button>
-          <button id="btnEjecutar" class="btn-primary">▶ Ejecutar</button>
+          <button id="btnEjemplo" class="btn-secondary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Ejemplo con input()
+          </button>
+          <button id="btnLimpiar" class="btn-secondary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            Limpiar
+          </button>
+          <button id="btnEjecutar" class="btn-primary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Ejecutar
+          </button>
         </div>
       </div>
 
@@ -104,11 +169,17 @@ else:
       </div>
     </div>
 
-    <aside class="card">
+    <aside class="card console-card">
       <div class="panel-head">
-        <h2>Terminal / Consola</h2>
+        <div class="panel-title-group">
+          <span class="terminal-icon">&gt;_</span>
+          <h2>Terminal / Consola</h2>
+        </div>
         <div class="acciones">
-          <button id="btnReiniciar" class="btn-secondary">↻ Reiniciar</button>
+          <button id="btnReiniciar" class="btn-secondary">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Reiniciar
+          </button>
         </div>
       </div>
 
@@ -129,11 +200,17 @@ else:
         </div>
 
         <div id="insignia" class="insignia">
-          <strong>🏅 Insignia obtenida</strong>
+          <div class="insignia-header">
+            <span class="badge-star">🏅</span>
+            <strong>Insignia Obtenida</strong>
+          </div>
           <div id="badgePreview"></div>
-          <button id="btnDescargar" class="btn-primary">Descargar insignia SVG</button>
+          <button id="btnDescargar" class="btn-primary btn-download">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar insignia SVG
+          </button>
           <div class="nota">
-            El código QR contiene el nombre ingresado en el formulario.
+            🔒 El código QR contiene la verificación con el nombre del estudiante.
           </div>
         </div>
       </div>
@@ -144,7 +221,6 @@ else:
 <div id="qrTemp"></div>
 
 <script src="app.js"></script>
-
 
 <footer class="site-footer">
   <div class="footer-bars">
@@ -160,3 +236,4 @@ else:
 
 </body>
 </html>
+

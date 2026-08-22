@@ -38,6 +38,18 @@ function escXML(v){
     .replaceAll("'","&apos;");
 }
 
+function setEstadoMotor(texto, tipo = "idle"){
+  if(!estadoMotor) return;
+  const dot = estadoMotor.querySelector(".status-dot");
+  const textSpan = estadoMotor.querySelector(".status-text");
+  estadoMotor.className = `estado-badge estado-${tipo}`;
+  if(dot && textSpan){
+    textSpan.textContent = texto;
+  } else {
+    estadoMotor.innerHTML = `<span class="status-dot"></span><span class="status-text">${escXML(texto)}</span>`;
+  }
+}
+
 /* ---------- NÚMEROS DE LÍNEA ---------- */
 function actualizarNumerosLinea(){
   const cantidad = Math.max(1, codigo.value.split("\n").length);
@@ -387,7 +399,7 @@ async function cargarPython(){
       );
     }
 
-    estadoMotor.textContent = "⏳ Motor Python: cargando...";
+    setEstadoMotor("⏳ Motor Python: cargando...", "loading");
     setConsole(
       "⏳ Cargando Python en el navegador...\n" +
       "La primera ejecución necesita conexión a Internet."
@@ -395,7 +407,7 @@ async function cargarPython(){
 
     const p = await loadPyodide({indexURL:PYODIDE_INDEX});
     pyodide = p;
-    estadoMotor.textContent = "✅ Motor Python: listo";
+    setEstadoMotor("✅ Motor Python: listo", "ready");
     return p;
   })();
 
@@ -531,7 +543,7 @@ async function ejecutarSesion(esReanudacion=false){
 
   try{
     const py = await cargarPython();
-    estadoMotor.textContent = "⚙️ Motor Python: ejecutando";
+    setEstadoMotor("⚙️ Motor Python: ejecutando", "running");
 
     try{
       await py.loadPackagesFromImports(codigoActual);
@@ -626,7 +638,7 @@ finally:
 
       setConsole(texto,"console-info");
       mostrarInput(payload);
-      estadoMotor.textContent = "⌨️ Python: esperando entrada";
+      setEstadoMotor("⌨️ Python: esperando entrada", "input");
       btnEjecutar.disabled = true;
       return;
     }
@@ -646,7 +658,7 @@ finally:
       setConsole(texto,"console-error");
       prepararNavegacionError(payload);
 
-      estadoMotor.textContent = "❌ Python: error";
+      setEstadoMotor("❌ Python: error", "error");
       btnEjecutar.disabled = false;
       sesionActiva = false;
       ocultarInsignia();
@@ -666,7 +678,7 @@ finally:
     }
 
     setConsole(texto,"console-ok");
-    estadoMotor.textContent = "✅ Motor Python: listo";
+    setEstadoMotor("✅ Motor Python: listo", "ready");
     btnEjecutar.disabled = false;
     sesionActiva = false;
     lineaErrorActual = null;
@@ -680,7 +692,7 @@ finally:
     btnEjecutar.disabled = false;
     ocultarInput();
     ocultarInsignia();
-    estadoMotor.textContent = "❌ Motor Python: error";
+    setEstadoMotor("❌ Motor Python: error", "error");
 
     setConsole(
       "❌ NO FUE POSIBLE EJECUTAR PYTHON\n\n" +
@@ -720,7 +732,11 @@ $("btnReiniciar").addEventListener("click",()=>{
   btnIrLinea.style.display = "none";
   btnExplicarError.style.display = "none";
   btnEjecutar.disabled = false;
-  estadoMotor.textContent = pyodide ? "✅ Motor Python: listo" : "⏳ Motor Python: sin iniciar";
+  if(pyodide){
+    setEstadoMotor("✅ Motor Python: listo", "ready");
+  } else {
+    setEstadoMotor("⏳ Motor Python: sin iniciar", "idle");
+  }
   setConsole("Sesión reiniciada. Presiona ▶ Ejecutar para comenzar.","console-info");
   actualizarNumerosLinea();
 });
@@ -800,7 +816,7 @@ window.addEventListener("load",()=>{
 
   setTimeout(()=>{
     if(typeof loadPyodide !== "function"){
-      estadoMotor.textContent = "⚠️ Pyodide no disponible";
+      setEstadoMotor("⚠️ Pyodide no disponible", "error");
       setConsole(
         "⚠️ Chrome abrió la aplicación, pero no pudo descargar Pyodide.\n\n" +
         "Compruebe la conexión a Internet o posibles bloqueos de red.",
