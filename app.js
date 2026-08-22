@@ -533,10 +533,13 @@ function crearInsignia(nom, documento){
   });
 
   const { pctManual, pctPegado } = calcularPorcentajes();
-  const selloTexto = pctManual >= 50
-    ? `Composición: ${pctManual}% Tipeo manual | ${pctPegado}% Pegado`
-    : `Composición: ${pctPegado}% Texto pegado | ${pctManual}% Tipeo manual`;
-  const selloColor = pctManual >= 50 ? "#4ade80" : "#38bdf8";
+  const esManual = pctManual >= 50;
+  const iconoFmt = esManual ? "✍" : "📋";
+  const selloTexto = esManual
+    ? `${iconoFmt} Autoría: Digitación activa (${pctManual}% manual | ${pctPegado}% pegado)`
+    : `${iconoFmt} Modo: Texto pegado/externo (${pctPegado}% pegado | ${pctManual}% manual)`;
+
+  const selloColor = esManual ? "#4ade80" : "#38bdf8";
 
   return `
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="560" viewBox="0 0 1000 560">
@@ -560,23 +563,24 @@ function crearInsignia(nom, documento){
   <text x="390" y="156"
         font-family="Arial" font-size="20" fill="#dce8f8">Código ejecutado correctamente</text>
 
-  <text x="90" y="280"
-        font-family="Arial" font-size="17" fill="#aebfd7">ESTUDIANTE</text>
+  <text x="90" y="270"
+        font-family="Arial" font-size="16" fill="#aebfd7">ESTUDIANTE</text>
 
-  <text x="90" y="325"
+  <text x="90" y="312"
         font-family="Arial" font-size="30" font-weight="bold" fill="#ffffff">${escXML(nom)}</text>
 
-  <text x="90" y="372"
+  <text x="90" y="356"
         font-family="Arial" font-size="22" fill="#f4b400">CC: ${escXML(documento)}</text>
 
-  <text x="90" y="425"
-        font-family="Arial" font-size="17" fill="#dce8f8">Competencia: ejecución de código Python</text>
+  <text x="90" y="405"
+        font-family="Arial" font-size="16" fill="#dce8f8">Competencia: ejecución de código Python</text>
 
-  <text x="90" y="460"
-        font-family="Arial" font-size="15" fill="#aebfd7">${escXML(fecha)}</text>
+  <text x="90" y="438"
+        font-family="Arial" font-size="14" fill="#aebfd7">${escXML(fecha)}</text>
 
-  <text x="90" y="498"
-        font-family="Arial" font-size="14" font-weight="bold" fill="${selloColor}">✍️ ${escXML(selloTexto)}</text>
+  <!-- Sello de Autoria / Porcentaje de Digitación -->
+  <rect x="90" y="464" width="600" height="40" rx="10" fill="#081b38" stroke="${selloColor}" stroke-width="2"/>
+  <text x="110" y="490" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="${selloColor}">${escXML(selloTexto)}</text>
 
   <rect x="725" y="245" width="205" height="205" rx="15" fill="#ffffff"/>
   <image href="${qrData}" x="738" y="258" width="180" height="180"/>
