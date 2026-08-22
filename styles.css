@@ -515,20 +515,24 @@ body {
 .acciones {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* Buttons */
 button {
   border: 0;
   border-radius: var(--radius-sm);
-  padding: 10px 16px;
+  padding: 0 14px;
+  height: 38px;
+  white-space: nowrap;
   cursor: pointer;
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 13px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   transition: all var(--transition-fast);
   user-select: none;
