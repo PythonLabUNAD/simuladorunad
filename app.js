@@ -9,9 +9,8 @@ let esperandoEntrada = false;
 let sesionActiva = false;
 let lineaErrorActual = null;
 let ultimoErrorTexto = "";
-let caracteresTipeados = 0;
-let caracteresPegados = 0;
-let ultimoLargoCodigo = 0;
+let totalCaracteresPegados = 0;
+let totalCaracteresTipeados = 0;
 
 const $ = id => document.getElementById(id);
 
@@ -41,51 +40,47 @@ function escXML(v){
     .replaceAll("'","&apos;");
 }
 
-function calcularPorcentajes(){
-  if(!codigo) return { pctManual: 100, pctPegado: 0 };
-  const lenActual = codigo.value.length;
-  if (!lenActual) {
-    return { pctManual: 100, pctPegado: 0 };
+function actualizarPorcentajes() {
+  const badgeTipeo = $("typingStats") || document.getElementById('badge-tipeo');
+  const total = totalCaracteresTipeados + totalCaracteresPegados;
+  
+  if (total === 0 || !codigo || !codigo.value.trim()) {
+    if (badgeTipeo) {
+      badgeTipeo.className = "typing-stat-badge";
+      badgeTipeo.textContent = "✍️ Tipeo: 100% | Pegado: 0%";
+    }
+    return;
   }
-
-  const totalAccion = caracteresTipeados + caracteresPegados;
-  if (totalAccion === 0) {
-    return { pctManual: 100, pctPegado: 0 };
+  
+  const porcentajeManual = Math.max(0, Math.min(100, Math.round((totalCaracteresTipeados / total) * 100)));
+  const porcentajePegado = 100 - porcentajeManual;
+  
+  // Actualizar badge en UI
+  if (badgeTipeo) {
+    if (porcentajeManual >= 50) {
+      badgeTipeo.className = "typing-stat-badge";
+      badgeTipeo.textContent = `✍️ Tipeo: ${porcentajeManual}% | Pegado: ${porcentajePegado}%`;
+    } else {
+      badgeTipeo.className = "typing-stat-badge pasted-mode";
+      badgeTipeo.textContent = `📋 Pegado: ${porcentajePegado}% | Tipeo: ${porcentajeManual}%`;
+    }
   }
+}
 
-  const pctManual = Math.max(0, Math.min(100, Math.round((caracteresTipeados / totalAccion) * 100)));
+function calcularPorcentajes() {
+  const total = totalCaracteresTipeados + totalCaracteresPegados;
+  if (total === 0) return { pctManual: 100, pctPegado: 0 };
+  const pctManual = Math.max(0, Math.min(100, Math.round((totalCaracteresTipeados / total) * 100)));
   const pctPegado = 100 - pctManual;
-
   return { pctManual, pctPegado };
 }
 
-function actualizarEstadisticasTipeo(){
-  const badge = $("typingStats");
-  if(!badge || !codigo) return;
-
-  const codigoTexto = codigo.value;
-  if(!codigoTexto.trim()){
-    caracteresTipeados = 0;
-    caracteresPegados = 0;
-    ultimoLargoCodigo = 0;
-    badge.className = "typing-stat-badge";
-    badge.textContent = "✍️ Tipeo: 100% | Pegado: 0%";
-    return;
-  }
-
-  const { pctManual, pctPegado } = calcularPorcentajes();
-
-  if(pctManual >= 50){
-    badge.className = "typing-stat-badge";
-    badge.textContent = `✍️ Tipeo: ${pctManual}% | Pegado: ${pctPegado}%`;
-  } else {
-    badge.className = "typing-stat-badge pasted-mode";
-    badge.textContent = `📋 Pegado: ${pctPegado}% | Tipeo: ${pctManual}%`;
-  }
+function actualizarEstadisticasTipeo() {
+  actualizarPorcentajes();
 }
 
-function actualizarMetricasAutoria(){
-  actualizarEstadisticasTipeo();
+function actualizarMetricasAutoria() {
+  actualizarPorcentajes();
 }
 
 function setEstadoMotor(texto, tipo = "idle"){
@@ -184,44 +179,34 @@ function prepararNavegacionError(error){
   }
 }
 
-codigo.addEventListener("paste", (e) => {
-  const pastedText = (e.clipboardData || window.clipboardData)?.getData("text") || "";
-  if(pastedText.length > 0){
-    caracteresPegados += pastedText.length;
-    actualizarMetricasAutoria();
+// Escuchar paste en todo el contenedor del editor / textarea
+document.querySelector('#codigo, #editor, .editor-container, textarea')?.addEventListener('paste', (e) => {
+  const textoPegado = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+  if (textoPegado.length > 0) {
+    totalCaracteresPegados += textoPegado.length;
+    actualizarPorcentajes();
   }
 });
 
-codigo.addEventListener("input",(e)=>{
+// Escuchar pulsaciones de teclado individuales
+document.querySelector('#codigo, #editor, .editor-container, textarea')?.addEventListener('keydown', (e) => {
+  // Ignorar teclas de control / comandos
+  if (!e.ctrlKey && !e.metaKey && e.key && e.key.length === 1) {
+    totalCaracteresTipeados += 1;
+    actualizarPorcentajes();
+  }
+});
+
+codigo.addEventListener("input", (e) => {
   lineaErrorActual = null;
   btnIrLinea.style.display = "none";
   ocultarExplicacion();
   actualizarNumerosLinea();
 
-  const nuevoLargo = codigo.value.length;
-  const delta = nuevoLargo - ultimoLargoCodigo;
-  ultimoLargoCodigo = nuevoLargo;
-
-  if (nuevoLargo === 0) {
-    caracteresTipeados = 0;
-    caracteresPegados = 0;
-    actualizarMetricasAutoria();
-    return;
-  }
-
-  if (delta > 0) {
-    const insertedData = e.data || "";
-    const esPasteNativo = e.inputType === "insertFromPaste" || e.inputType === "insertFromDrop";
-    const esRafaga = delta > 3 && !insertedData.includes("\n") && insertedData !== "    ";
-
-    if (esPasteNativo || esRafaga) {
-      if (!esPasteNativo) {
-        caracteresPegados += delta;
-      }
-    } else {
-      caracteresTipeados += delta;
-    }
-    actualizarMetricasAutoria();
+  if (!codigo.value.trim()) {
+    totalCaracteresTipeados = 0;
+    totalCaracteresPegados = 0;
+    actualizarPorcentajes();
   }
 });
 
@@ -871,11 +856,10 @@ if promedio >= 3:
 else:
     print("Resultado: No aprobado")`;
   lineaErrorActual = null;
-  caracteresTipeados = codigo.value.length;
-  caracteresPegados = 0;
-  ultimoLargoCodigo = codigo.value.length;
+  totalCaracteresTipeados = codigo.value.length;
+  totalCaracteresPegados = 0;
   actualizarNumerosLinea();
-  actualizarEstadisticasTipeo();
+  actualizarPorcentajes();
 });
 
 $("btnLimpiar").addEventListener("click",()=>{
@@ -883,9 +867,8 @@ $("btnLimpiar").addEventListener("click",()=>{
   entradasUsuario = [];
   codigoActual = "";
   lineaErrorActual = null;
-  caracteresTipeados = 0;
-  caracteresPegados = 0;
-  ultimoLargoCodigo = 0;
+  totalCaracteresTipeados = 0;
+  totalCaracteresPegados = 0;
   ocultarInput();
   ocultarInsignia();
   btnIrLinea.style.display = "none";
@@ -893,7 +876,7 @@ $("btnLimpiar").addEventListener("click",()=>{
   btnEjecutar.disabled = false;
   setConsole("Editor limpio. Escribe un programa y presiona ▶ Ejecutar.","console-info");
   actualizarNumerosLinea();
-  actualizarEstadisticasTipeo();
+  actualizarPorcentajes();
 });
 
 $("btnDescargar").addEventListener("click",()=>{
@@ -934,10 +917,9 @@ codigo.addEventListener("keydown",(e)=>{
 
 window.addEventListener("load",()=>{
   actualizarNumerosLinea();
-  if(codigo){
-    ultimoLargoCodigo = codigo.value.length;
-    caracteresTipeados = codigo.value.length;
-    actualizarEstadisticasTipeo();
+  if(codigo && codigo.value.length > 0){
+    totalCaracteresTipeados = codigo.value.length;
+    actualizarPorcentajes();
   }
 
   setTimeout(()=>{
